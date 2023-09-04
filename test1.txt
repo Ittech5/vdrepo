@@ -1,0 +1,2 @@
+ am trying to deploy APIM endpoint where logic app is the backend for it and during the deployment validation kept getting the validation error:
+All template parameters used in the UriTemplate must be defined in the Operation 'Send-Documents', and vice-versa. Here is the snippet of the json template used for Send-Documents where {claimId} is the template parameter:
