@@ -1,0 +1,119 @@
+1. create swap memory
+
+pvcreate /dev/sdc
+pvs
+vgcreate ora_vg /dev/sdc
+vgs
+lvcreate -L +8G -n swaplv app_vg
+lvs
+mkswap /dev/ora_vg/swaplv
+lsblk -f
+
+vi /etc/fstab
+UUID=84cc743b-dc73-495b-af2a-62d19444bbab /swap         swap    defaults,nofail    0    0
+
+swapon -a
+free -mh
+
+_________________________________________________________________________
+
+2. create mountpoints
+
+
+lvcreate -L +2G -n ora01 ora_vg
+lvcreate -L +2G -n ora02 ora_vg
+lvcreate -L +2G -n ora03 ora_vg
+lvcreate -L +100G -n oratmp ora_vg
+lvcreate -L +50G -n oralog01 ora_vg
+lvcreate -L +50G -n oralog02 ora_vg
+lvcreate -L +100G -n orahomelv ora_vg
+lvcreate -L +500G -n GG_Home ora_vg
+lvcreate -L +3072G -n GG_Extract ora_vg
+lvcreate -L +3072G -n GG_Replicat ora_vg
+lvs
+
+mkfs.xfs /dev/ora_vg/ora01      
+mkfs.xfs /dev/ora_vg/ora02      
+mkfs.xfs /dev/ora_vg/ora03      
+mkfs.xfs /dev/ora_vg/oratmp     
+mkfs.xfs /dev/ora_vg/oralog01   
+mkfs.xfs /dev/ora_vg/oralog02   
+mkfs.xfs /dev/ora_vg/orahomelv  
+mkfs.xfs /dev/ora_vg/GG_Home    
+mkfs.xfs /dev/ora_vg/GG_Extract 
+mkfs.xfs /dev/ora_vg/GG_Replicat
+
+
+mkdir /ora01
+mkdir /ora02
+mkdir /ora03
+mkdir /oratmp
+mkdir /oralog01
+mkdir /oralog02
+mkdir /oracle
+mkdir /oracle/home
+mkdir /GG_Home
+mkdir /goldengate01
+mkdir /goldengate02
+
+
+lsblk -f and check lvm size before proceeding:
+
+sdc                    8:32   0    8T  0 disk
+├─ora_vg-ora01       253:0    0    2G  0 lvm  /ora01
+├─ora_vg-ora02       253:1    0    2G  0 lvm  /ora02
+├─ora_vg-ora03       253:2    0    2G  0 lvm  /ora03
+├─ora_vg-oratmp      253:3    0  100G  0 lvm  /oratmp
+├─ora_vg-oralog01    253:4    0   50G  0 lvm  /oralog01
+├─ora_vg-oralog02    253:5    0   50G  0 lvm  /oralog02
+├─ora_vg-orahomelv   253:6    0  100G  0 lvm  /oracle/home
+├─ora_vg-GG_Home     253:7    0  500G  0 lvm  /GG_Home
+├─ora_vg-GG_Extract  253:8    0    3T  0 lvm  /goldengate01
+├─ora_vg-GG_Replicat 253:9    0    3T  0 lvm  /goldengate02
+└─ora_vg-swaplv      253:10   0   64G  0 lvm  [SWAP]
+
+
+
+vim /etc/fstab 
+
+
+UUID=a5950919-8df7-413e-b31d-e7565b7949ac /ora01          xfs    defaults,nofail    0    0
+UUID=673a18fc-c65a-4163-95c6-ff6fe5041495 /ora02          xfs    defaults,nofail    0    0
+UUID=6d9e9168-240f-42ab-a1cc-064e7a3124da /ora03          xfs    defaults,nofail    0    0
+UUID=fd8b0a4c-13ce-4907-86b9-aa2b695b6135 /oratmp         xfs    defaults,nofail    0    0
+UUID=6c0ca746-4f40-485e-b9f0-a97aa82001b2 /oralog01       xfs    defaults,nofail    0    0
+UUID=5772f773-96ad-43d0-a476-2cf1c4d46df7 /oralog02       xfs    defaults,nofail    0    0
+UUID=50cdaa47-7d36-488a-9693-8c7abb21d4a3 /oracle/home    xfs    defaults,nofail    0    0
+UUID=69502586-a08b-423e-ad4f-d93c29db4f5b /GG_Home        xfs    defaults,nofail    0    0
+UUID=122dc869-0913-4d59-8bcc-265dd5ac7599 /goldengate01     xfs    defaults,nofail    0    0
+UUID=e2fbfe9e-f441-4c0d-b083-7a98a73ce402 /goldengate02    xfs    defaults,nofail    0    0
+
+
+UUID=824d4af0-9aa2-406b-a17b-d0b8d539d567 /swap           swap   defaults,nofail    0    0
+
+mount -a 
+
+lsblk -f
+
+
+_________________________________________________________________________
+
+3. install crowdstrike
+
+_________________________________________________________________________
+
+4. oracle user + sudo permissions
+
+_________________________________________________________________________
+
+5. disable firewall and restart vm
+ 
+systemctl status firewalld
+systemctl disable firewalld
+systemctl stop firewalld 
+systemctl status firewalld
+
+restart:
+sudo shutdown now -r
+ 
+
