@@ -109,6 +109,12 @@ _________________________________________________________________________
 5. disable firewall and restart vm
  
 systemctl status firewalld
+
+
+
+
+
+jblkjnlkh
 systemctl disable firewalld
 systemctl stop firewalld 
 systemctl status firewalld
